@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Instagram Report Tool</title>
+
+<style>
+:root {
+    --bg-color: #f5f6fa;
+    --text-color: #111111;
+    --subtext-color: #606060;
+    --header-bg: #ffffff;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --page1-bg: radial-gradient(circle at top, #e0e8ff 0%, #f5f6fa 70%);
+    --container-bg: rgba(255, 255, 255, 0.9);
+    --container-border: #d1d5db;
+    --input-bg: rgba(240, 240, 245, 0.9);
+    --input-border: rgba(200, 200, 205, 0.4);
+    --input-text: #111111;
+    --popup-bg: #ffffff;
+    --popup-border: rgba(0, 0, 0, 0.1);
+    --popup-text: #111111;
+    --item-icon-bg: #f0f0f5;
+    --logo-bg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #000000;
+        --text-color: #ffffff;
+        --subtext-color: #8e8e93;
+        --header-bg: #000000;
+        --border-color: rgba(255, 255, 255, 0.15);
+        --page1-bg: radial-gradient(circle at top, #120024 0%, #000000 70%);
+        --container-bg: rgba(10, 10, 10, 0.9);
+        --container-border: rgba(255, 255, 255, 0.15);
+        --input-bg: rgba(20, 20, 20, 0.9);
+        --input-border: rgba(255, 255, 255, 0.2);
+        --input-text: #ffffff;
+        --popup-bg: #1c1c1e;
+        --popup-border: rgba(255, 255, 255, 0.06);
+        --popup-text: #ffffff;
+        --item-icon-bg: #121218;
+        --logo-bg: #ffffff;
+    }
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000000;
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    touch-action: pan-y;
+}
+
+.page {
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--bg-color);
+    z-index: 10;
+}
+
+.page.active {
+    display: block !important;
+}
+
+/* FIXED GLOBAL HEADER CONTAINER */
+#globalHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 44px;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+    z-index: 500;
+}
+
+.fixed-back-arrow {
+    position: absolute;
+    left: 10px;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 510;
+}
+
+.fixed-title-container {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fixed-title-text {
+    position: absolute;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color);
+    width: 100%;
+    transition: opacity 0.05s linear;
+}
+
+#titleReport {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#titleReports {
+    opacity: 1;
+}
+
+/* BODY CONTENT TRANSITION AREA */
+.page-content-body {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 44px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    will-change: transform;
+    box-sizing: border-box;
+}
+
+#pageReports {
+    display: none;
+    background: var(--bg-color);
+    color: var(--text-color);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 44px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 20;
+    will-change: transform;
+}
+#pageReports.active {
+    display: block !important;
+}
+
+#page3 {
+    display: none;
+    background: var(--bg-color);
+    color: var(--text-color);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    will-change: transform;
+    box-shadow: -6px 0 16px rgba(0,0,0,0.25);
+}
+#page3.active {
+    display: block !important;
+}
+
+.page-center-wrap {
+    background: var(--page1-bg);
+    padding: 20px;
+    padding-bottom: 90px;
+    display: none;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.page-center-wrap.active {
+    display: flex !important;
+}
+
+.container {
+    background: var(--container-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 20px;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 360px;
+    border: 1px solid var(--container-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+}
+
+.top-heading {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    letter-spacing: 1px;
+}
+
+label {
+    font-size: 11px;
+    color: var(--subtext-color);
+    font-weight: 700;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    color: var(--input-text);
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+}
+
+button#submitBtn, .save-assets-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--text-color) 0%, var(--subtext-color) 100%);
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--bg-color);
+    margin-top: 18px;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.neon-circles-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 15px 0 5px 0;
+}
+
+.neon-circle-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.neon-circle {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: var(--item-icon-bg);
+    border: 2px dashed var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.neon-circle .plus-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.neon-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.neon-circle-label {
+    font-size: 11px;
+    color: var(--subtext-color);
+    margin-top: 6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.bottom-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: var(--header-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.dock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    cursor: pointer;
+    color: var(--subtext-color);
+    font-size: 11px;
+    font-weight: 500;
+    gap: 3px;
+}
+
+.dock-item.active, .dock-item:hover {
+    color: var(--text-color);
+}
+
+.status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 16px;
+    font-weight: 600;
+    margin: 0;
+    font-size: 13.5px;
+    background: #00d911;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.circle-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    margin-right: 14px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+#logoContainer {
+    width: 54px;
+    height: 54px;
+    background: var(--logo-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+.more-btn-container {
+    padding: 0px 15px calc(26px + env(safe-area-inset-bottom, 17px)) 17px;
+    padding-bottom: 25px;
+	background: var(--header-bg);
+    flex-shrink: 0;
+    margin-top: 0px;
+}
+.more-btn {
+    background: #0095f6;
+    color: #fff;
+    padding: 14px;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 20px 10px 10px 10px;
+    padding-bottom: 13px;
+    box-sizing: border-box;
+}
+.popup-sheet {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+.popup-group {
+    background: var(--popup-bg);
+    border: 0.1px solid var(--popup-border);
+    border-radius: 15px;
+    overflow: hidden;
+}
+.popup-item {
+    padding: 18px 16px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--popup-text);
+}
+.popup-item.red-text { color: #e60000; }
+.popup-item:not(:last-child) { border-bottom: 1px solid var(--popup-border); }
+.popup-cancel {
+    background: var(--popup-bg);
+    border: 0.1px solid var(--popup-border);
+    border-radius: 15px;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--popup-text);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+#toastMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(20, 20, 22, 0.45);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    color: #ffffff;
+    padding: 16px 26px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 2000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+#toastMessage.show {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+</style>
+</head>
+
+<body>
+
+<div id="toastMessage"></div>
+
+<div id="globalHeader" style="display:none;">
+    <div class="fixed-back-arrow" onclick="handleHeaderBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: scale(1.2);">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </div>
+    <div class="fixed-title-container">
+        <span id="titleReports" class="fixed-title-text">Reports</span>
+        <span id="titleReport" class="fixed-title-text">Report</span>
+    </div>
+</div>
+
+<div id="pageHome" class="page-center-wrap active">
+<div class="container">
+<div class="top-heading">
+    𝐎𝐆 𝐍𝐎𝐓𝚰 𝐌𝐀𝐊𝐄𝐑🔌☠️
+</div>
+
+<label>Target Username</label>
+<input type="text" id="username" placeholder="username">
+
+<label>Report Reason</label>
+<select id="reason">
+<option>spam</option>
+<option>hate speech or symbol</option>
+<option>impersonation</option>
+<option>underage</option>
+<option>bullying and harassment</option>
+<option>violence or dangerous organisation</option>
+<option>nudity or sexual activity</option>
+<option>scam and fraud</option>
+<option>drugs</option>
+<option>suicide or self-injury</option>
+</select>
+
+<label>Report Time (e.g. 1m, 1h, 1d or 10 August)</label>
+<input type="text" id="reportTimeInput" placeholder="1m, 1h, 1d, 10 August">
+
+<label>Support Time (e.g. 1m, 1h, 1d or 12 August)</label>
+<input type="text" id="supportTimeInput" placeholder="1m, 1h, 1d, 12 August">
+
+<button id="submitBtn" type="button" onclick="saveAndGo()">GET NOTI</button>
+</div>
+</div>
+
+<div id="pageMenu" class="page-center-wrap">
+<div class="container">
+<div class="top-heading">
+    𝐒𝐄𝐋𝐄𝐂𝐓 𝐘𝐎𝐔𝐑 𝐏𝐅𝐏 𝐀𝐍𝐃 𝚰𝐆 𝐋𝐎𝐆𝐎
+</div>
+
+<div class="neon-circles-row">
+    <div class="neon-circle-group" onclick="document.getElementById('pfpInput').click()">
+        <div class="neon-circle">
+            <img id="previewPfp" style="display:none;">
+            <div class="plus-badge">+</div>
+        </div>
+        <div class="neon-circle-label">PFP</div>
+    </div>
+    <input type="file" id="pfpInput" accept="image/*" style="display:none" onchange="previewAsset(this, 'previewPfp')">
+
+    <div class="neon-circle-group" onclick="document.getElementById('logoInput').click()">
+        <div class="neon-circle">
+            <img id="previewLogo" style="display:none;">
+            <div class="plus-badge">+</div>
+        </div>
+        <div class="neon-circle-label">IG Logo</div>
+    </div>
+    <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="previewAsset(this, 'previewLogo')">
+</div>
+
+<button type="button" class="save-assets-btn" onclick="saveAssetsSync()">SAVE & SYNC</button>
+
+<div style="margin-top: 18px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 12px;">
+    <div style="font-size: 11px; color: var(--subtext-color); margin-bottom: 4px;">App Version v4.0.0</div>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-color);">
+        <span>made by @mx4xi</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.261.26-.536.26l.191-3.05 5.55-5.018c.241-.219-.054-.341-.373-.121l-6.865 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+    </div>
+</div>
+</div>
+</div>
+
+<div id="pageReports" class="page">
+    <div id="report-list" style="width:100%;"></div>
+</div>
+
+<div id="page3" class="page">
+    <div id="page3ContentBody" class="page-content-body" style="display:flex; flex-direction:column;">
+        <div id="status-bar" class="status-bar">Closed</div>
+
+        <div style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
+            <div style="display:flex; align-items:center; margin-bottom:16px;">
+                <img id="disp-pfp" class="circle-img" style="background:var(--item-icon-bg);">
+                <div style="font-size: 13.5px; line-height: 1.4; color: var(--text-color);">
+                You anonymously reported <span id="disp-user"></span> for <span id="disp-reason"></span>.<br>
+                <span id="disp-time" style="color:var(--subtext-color); font-size:13px; font-weight:500;"></span>
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid var(--border-color); margin-bottom:18px;"></div>
+
+            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px;">
+                <div id="logoContainer">
+                    <svg id="defaultIgIcon" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                        <defs>
+                            <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#f09433"/>
+                                <stop offset="25%" stop-color="#e6683c"/>
+                                <stop offset="50%" stop-color="#dc2743"/>
+                                <stop offset="75%" stop-color="#cc2366"/>
+                                <stop offset="100%" stop-color="#bc1888"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#igGrad)" stroke-width="2"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="url(#igGrad)" stroke-width="2"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="url(#igGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                    <img id="customLogoImg" style="width:100%; height:100%; object-fit:cover; display:none;">
+                </div>
+
+                <div style="flex: 1; display: flex; flex-direction: column; padding-top: 15px;">
+                    <div id="disp-title-text" style="font-size: 13.5px; font-weight: 600; color: var(--text-color); line-height: 1.32; margin-bottom: 14px;"></div>
+                    <div id="disp-msg-p1" style="font-size: 13.5px; color: var(--text-color); line-height: 1.35; margin-bottom: 14px;"></div>
+                    <div id="disp-msg-p2" style="font-size: 13.5px; color: var(--text-color); line-height: 1.35; margin-bottom: 1px;"></div>
+                    <div id="disp-time-bottom" style="color: var(--subtext-color); font-size: 13px; font-weight: 500; margin-top: 0px;"></div>
+                </div>
+            </div>
+
+            <div style="border-bottom:1px solid var(--border-color); margin-top: auto; padding-bottom: 8px;"></div>
+        </div>
+
+        <div class="more-btn-container">
+            <div class="more-btn" onclick="openPopup()">More Options</div>
+        </div>
+    </div>
+</div>
+
+<div id="bottomDock" class="bottom-dock">
+    <div id="dockHome" class="dock-item active" onclick="showPage('pageHome')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+    </div>
+    <div id="dockMenu" class="dock-item" onclick="showPage('pageMenu')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <span>Menu</span>
+    </div>
+    <div id="dockDm" class="dock-item" onclick="showPage('pageReports')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span>Reports</span>
+    </div>
+</div>
+
+<div id="popupOverlay" class="popup-overlay" onclick="closePopup(event)">
+    <div class="popup-sheet">
+        <div class="popup-group">
+            <div id="pop-block" class="popup-item red-text" onclick="handlePopupBlock()"></div>
+            <div id="pop-restrict" class="popup-item red-text" onclick="handlePopupRestrict()"></div>
+            <div class="popup-item" onclick="openCommunityGuidelines()">See Community Guidelines</div>
+        </div>
+        <div class="popup-cancel" onclick="closePopupForce()">Cancel</div>
+    </div>
+</div>
+
+<script>
+let liveTimerInterval = null;
+let currentActiveUsername = '';
+let currentActivePage = 'pageHome';
+
+window.onload = function() {
+    loadSavedAssetsIntoPreviews();
+    initHeaderCrossoverSwipe();
+};
+
+function previewAsset(input, previewId) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById(previewId);
+            img.src = e.target.result;
+            img.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function loadSavedAssetsIntoPreviews() {
+    const savedPfp = localStorage.getItem('global_pfp');
+    const savedLogo = localStorage.getItem('global_logo');
+    
+    if(savedPfp) {
+        const pfpImg = document.getElementById('previewPfp');
+        pfpImg.src = savedPfp;
+        pfpImg.style.display = 'block';
+    }
+    if(savedLogo) {
+        const logoImg = document.getElementById('previewLogo');
+        logoImg.src = savedLogo;
+        logoImg.style.display = 'block';
+    }
+}
+
+function parseCustomTime(timeStr) {
+    if(!timeStr) return 60;
+    timeStr = timeStr.trim();
+    
+    const lowerStr = timeStr.toLowerCase();
+    const monthsList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+    const hasMonth = monthsList.some(m => lowerStr.includes(m));
+    if (hasMonth || (!lowerStr.includes('s') && !lowerStr.includes('m') && !lowerStr.includes('h') && !lowerStr.includes('d') && isNaN(timeStr))) {
+        return timeStr; 
+    }
+
+    const num = parseInt(lowerStr);
+    if(isNaN(num)) return timeStr;
+    
+    if(lowerStr.includes('s')) return num;
+    if(lowerStr.includes('h')) return num * 3600;
+    if(lowerStr.includes('d')) return num * 86400;
+    if(lowerStr.includes('m')) return num * 60;
+    return num * 60;
+}
+
+function formatElapsedTime(totalSeconds) {
+    if(typeof totalSeconds !== 'number' || isNaN(totalSeconds)) {
+        return totalSeconds;
+    }
+
+    if(totalSeconds >= 7 * 86400) {
+        const dateObj = new Date(Date.now() - totalSeconds * 1000);
+        const day = dateObj.getDate();
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        return `${day} ${months[dateObj.getMonth()]}`; 
+    }
+    if(totalSeconds < 60) {
+        const s = Math.max(1, totalSeconds);
+        return s === 1 ? '1s' : `${s}s`;
+    }
+    if(totalSeconds < 3600) {
+        const m = Math.floor(totalSeconds / 60);
+        return m === 1 ? '1m' : `${m}m`;
+    }
+    if(totalSeconds < 86400) {
+        const h = Math.floor(totalSeconds / 3600);
+        return h === 1 ? '1h' : `${h}h`;
+    }
+    const d = Math.floor(totalSeconds / 86400);
+    return d === 1 ? '1d' : `${d}d`;
+}
+
+function formatDetailedTime(totalSeconds) {
+    if(typeof totalSeconds !== 'number' || isNaN(totalSeconds)) {
+        return totalSeconds;
+    }
+
+    if(totalSeconds >= 7 * 86400) {
+        const dateObj = new Date(Date.now() - totalSeconds * 1000);
+        const day = dateObj.getDate();
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        return `${day} ${months[dateObj.getMonth()]}`; 
+    }
+    if(totalSeconds < 60) {
+        const s = Math.max(1, totalSeconds);
+        return s === 1 ? '1 second ago' : `${s} seconds ago`;
+    }
+    if(totalSeconds < 3600) {
+        const m = Math.floor(totalSeconds / 60);
+        return m === 1 ? '1 minute ago' : `${m} minutes ago`;
+    }
+    if(totalSeconds < 86400) {
+        const h = Math.floor(totalSeconds / 3600);
+        return h === 1 ? '1 hour ago' : `${h} hours ago`;
+    }
+    const d = Math.floor(totalSeconds / 86400);
+    return d === 1 ? '1 day ago' : `${d} days ago`;
+}
+
+function showPage(id){
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+    }
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+
+    if (liveTimerInterval) {
+        clearInterval(liveTimerInterval);
+        liveTimerInterval = null;
+    }
+
+    currentActivePage = id;
+
+    if(id === 'pageReports') {
+        updateStoredTimes();
+        const reports = JSON.parse(localStorage.getItem('my_reports_final') || '[]');
+        renderList(reports);
+        const pRep = document.getElementById('pageReports');
+        if (pRep) pRep.scrollTop = 0;
+    }
+
+    if(id === 'page3') {
+        const p3Body = document.getElementById('page3ContentBody');
+        if (p3Body) p3Body.scrollTop = 0;
+    }
+
+    document.querySelectorAll('.page-center-wrap, .page').forEach(p => {
+        p.classList.remove('active');
+        p.style.display = 'none';
+        p.style.transform = '';
+    });
+
+    const targetEl = document.getElementById(id);
+    if(targetEl) {
+        targetEl.classList.add('active');
+        if (targetEl.classList.contains('page-center-wrap')) {
+            targetEl.style.display = 'flex';
+        } else {
+            targetEl.style.display = 'block';
+        }
+    }
+
+    const globalHeader = document.getElementById('globalHeader');
+    const titleReport = document.getElementById('titleReport');
+    const titleReports = document.getElementById('titleReports');
+
+    if(id === 'pageReports') {
+        globalHeader.style.display = 'flex';
+        titleReport.style.opacity = '0';
+        titleReports.style.opacity = '1';
+    } else if(id === 'page3') {
+        globalHeader.style.display = 'flex';
+        titleReport.style.opacity = '1';
+        titleReports.style.opacity = '0';
+    } else {
+        globalHeader.style.display = 'none';
+    }
+
+    const dock = document.getElementById('bottomDock');
+    document.querySelectorAll('.dock-item').forEach(item => item.classList.remove('active'));
+
+    if(id === 'pageHome') {
+        document.getElementById('dockHome').classList.add('active');
+        dock.style.display = 'flex';
+    } else if(id === 'pageMenu') {
+        document.getElementById('dockMenu').classList.add('active');
+        dock.style.display = 'flex';
+    } else {
+        dock.style.display = 'none';
+    }
+}
+
+function handleHeaderBack() {
+    if (currentActivePage === 'page3') {
+        showPage('pageReports');
+    } else {
+        showPage('pageHome');
+    }
+}
+
+function initHeaderCrossoverSwipe() {
+    let startX = 0;
+    let startY = 0;
+    let isTracking = false;
+    let isSwiping = false;
+    let currentDiffX = 0;
+
+    const page3 = document.getElementById('page3');
+    const pageReports = document.getElementById('pageReports');
+    const titleReport = document.getElementById('titleReport');
+    const titleReports = document.getElementById('titleReports');
+
+    page3.addEventListener('touchstart', (e) => {
+        if (!page3.classList.contains('active')) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        currentDiffX = 0;
+        isTracking = true;
+        isSwiping = false;
+    }, { passive: true });
+
+    page3.addEventListener('touchmove', (e) => {
+        if (!isTracking || !page3.classList.contains('active')) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+
+        if (!isSwiping) {
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                isTracking = false;
+                return;
+            }
+            if (diffX > 5) {
+                isSwiping = true;
+            }
+        }
+
+        if (isSwiping && diffX > 0) {
+            if (e.cancelable) e.preventDefault();
+            currentDiffX = diffX;
+
+            if (pageReports) {
+                pageReports.style.display = 'block';
+            }
+
+            page3.style.transition = 'none';
+            pageReports.style.transition = 'none';
+            titleReport.style.transition = 'none';
+            titleReports.style.transition = 'none';
+
+            const screenWidth = window.innerWidth;
+            const progress = Math.min(1, diffX / screenWidth);
+
+            const reportsTranslate = -15 * (1 - progress);
+
+            page3.style.transform = `translate3d(${diffX}px, 0, 0)`;
+            pageReports.style.transform = `translate3d(${reportsTranslate}%, 0, 0)`;
+
+            let titleProgress = 0;
+            if (progress >= 0.25) {
+               titleProgress = (progress - 0.25) / 0.45; 
+            }
+
+            titleReport.style.opacity = `${1 - titleProgress}`;
+            titleReports.style.opacity = `${titleProgress}`;
+        }
+    }, { passive: false });
+
+    page3.addEventListener('touchend', (e) => {
+        if (!isTracking || !page3.classList.contains('active')) return;
+        isTracking = false;
+        if (!isSwiping) return;
+        isSwiping = false;
+
+        const screenWidth = window.innerWidth;
+        const dragPercentage = currentDiffX / screenWidth;
+
+        const transitionAnim = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+        page3.style.transition = transitionAnim;
+        pageReports.style.transition = transitionAnim;
+        titleReport.style.transition = 'opacity 0.2s linear';
+        titleReports.style.transition = 'opacity 0.2s linear';
+
+        if (dragPercentage >= 0.10 || currentDiffX >= 25) {
+            page3.style.transform = 'translate3d(100%, 0, 0)';
+            pageReports.style.transform = 'translate3d(0, 0, 0)';
+            
+            titleReport.style.opacity = '0';
+            titleReports.style.opacity = '1';
+
+            setTimeout(() => {
+                page3.style.transform = '';
+                page3.style.transition = '';
+                pageReports.style.transform = '';
+                pageReports.style.transition = '';
+                titleReport.style.transition = '';
+                titleReports.style.transition = '';
+                showPage('pageReports');
+            }, 250);
+        } else {
+            page3.style.transform = 'translate3d(0, 0, 0)';
+            pageReports.style.transform = 'translate3d(-15%, 0, 0)';
+
+            titleReport.style.opacity = '1';
+            titleReports.style.opacity = '0';
+
+            setTimeout(() => {
+                page3.style.transform = '';
+                page3.style.transition = '';
+                pageReports.style.transform = '';
+                pageReports.style.transition = '';
+                if (!pageReports.classList.contains('active')) {
+                    pageReports.style.display = 'none';
+                }
+                titleReport.style.transition = '';
+                titleReports.style.transition = '';
+            }, 250);
+        }
+    });
+}
+
+function saveAssetsSync() {
+    const pfpFile = document.getElementById('pfpInput').files[0];
+    const logoFile = document.getElementById('logoInput').files[0];
+
+    const applySync = (pfpUrl, logoUrl) => {
+        if(pfpUrl !== null) localStorage.setItem('global_pfp', pfpUrl);
+        if(logoUrl !== null) localStorage.setItem('global_logo', logoUrl);
+
+        let reports = JSON.parse(localStorage.getItem('my_reports_final') || '[]');
+        const currentPfp = localStorage.getItem('global_pfp') || '';
+        const currentLogo = localStorage.getItem('global_logo') || '';
+
+        reports = reports.map(rep => {
+            if(currentPfp) rep.pfp = currentPfp;
+            if(currentLogo) rep.logo = currentLogo;
+            return rep;
+        });
+        localStorage.setItem('my_reports_final', JSON.stringify(reports));
+        alert('Assets saved & synced with all reports successfully!');
+    };
+
+    if (pfpFile) {
+        const readerPfp = new FileReader();
+        readerPfp.onload = function(e1) {
+            const pfpUrl = e1.target.result;
+            if (logoFile) {
+                const readerLogo = new FileReader();
+                readerLogo.onload = function(e2) { applySync(pfpUrl, e2.target.result); };
+                readerLogo.readAsDataURL(logoFile);
+            } else {
+                applySync(pfpUrl, null);
+            }
+        };
+        readerPfp.readAsDataURL(pfpFile);
+    } else if (logoFile) {
+        const readerLogo = new FileReader();
+        readerLogo.onload = function(e2) { applySync(null, e2.target.result); };
+        readerLogo.readAsDataURL(logoFile);
+    } else {
+        applySync(null, null);
+    }
+}
+
+function updateStoredTimes() {
+    let reports = JSON.parse(localStorage.getItem('my_reports_final') || '[]');
+    const now = Math.floor(Date.now() / 1000);
+    reports = reports.map(rep => {
+        if(!rep.createdAt) rep.createdAt = now;
+        const elapsed = now - rep.createdAt;
+        
+        if(typeof rep.reportBaseSec === 'number') {
+            rep.time = formatDetailedTime(rep.reportBaseSec + elapsed);
+        }
+        if(typeof rep.supportBaseSec === 'number') {
+            rep.supportTime = formatElapsedTime(rep.supportBaseSec + elapsed);
+        }
+        return rep;
+    });
+    localStorage.setItem('my_reports_final', JSON.stringify(reports));
+}
+
+function saveAndGo(){
+    const user = document.getElementById('username').value.trim() || 'username';
+    const reason = document.getElementById('reason').value;
+    const rawReportTime = document.getElementById('reportTimeInput').value.trim() || '1m';
+    const rawSupportTime = document.getElementById('supportTimeInput').value.trim() || '1m';
+    const now = Math.floor(Date.now() / 1000);
+
+    const reportSec = parseCustomTime(rawReportTime);
+    const supportSec = parseCustomTime(rawSupportTime);
+    
+    const pfpUrl = localStorage.getItem('global_pfp') || '';
+    const logoUrl = localStorage.getItem('global_logo') || '';
+
+    const newReport = {
+        user, 
+        reason, 
+        rawReportTime,
+        rawSupportTime,
+        createdAt: now,
+        reportBaseSec: typeof reportSec === 'number' ? reportSec : null,
+        supportBaseSec: typeof supportSec === 'number' ? supportSec : null,
+        time: formatDetailedTime(typeof reportSec === 'number' ? reportSec : rawReportTime), 
+        supportTime: formatElapsedTime(typeof supportSec === 'number' ? supportSec : rawSupportTime), 
+        pfp: pfpUrl, 
+        logo: logoUrl
+    };
+    
+    let reports = JSON.parse(localStorage.getItem('my_reports_final') || '[]');
+    reports.unshift(newReport);
+    localStorage.setItem('my_reports_final', JSON.stringify(reports));
+    
+    showPage('pageReports');
+}
+
+function renderList(reports){
+    const listContainer = document.getElementById('report-list');
+    listContainer.innerHTML = '';
+    
+    reports.forEach((data, index)=>{
+        const timeToShow = data.supportTime || data.rawSupportTime || '1m';
+        
+        listContainer.innerHTML += `
+        <div style="border-bottom:1px solid var(--border-color);padding:15px 16px;cursor:pointer;background:var(--header-bg);" onclick="viewReport(${index})">
+            <div style="display:flex;align-items:center;width:100%;">
+                <div style="width:44px;height:44px;background:#090909;border:1.2px solid #282828;border-radius:10px;margin-right:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+                    <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="30" r="16" stroke="#FFFFFF" stroke-width="7.5" fill="none" />
+                        <path d="M 20 74 C 20 58, 33 55, 50 55 C 67 55, 80 58, 80 74" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round" fill="none" />
+                    </svg>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:13.5px;color:var(--text-color);margin-bottom:4px;text-align:left;">
+                    <span>You anonymously reported ${data.user}'s account for ${data.reason}.</span>
+                    <span style="color:#8e8e93;font-size:13px;font-weight:400;">${timeToShow}</span>
+                </div>
+                <div style="color:#8e8e93;font-size:13px;font-weight:400;text-align:left;">Reviewed</div>
+                </div>
+            </div>
+        </div>`;
+    });
+}
+
+function viewReport(index){
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+    }
+    if (liveTimerInterval) clearInterval(liveTimerInterval);
+
+    let reports = JSON.parse(localStorage.getItem('my_reports_final') || '[]');
+    const data = reports[index];
+    
+    if(data) {
+        currentActiveUsername = data.user;
+
+        const updateDynamicTimes = () => {
+            const now = Math.floor(Date.now() / 1000);
+            if(!data.createdAt) data.createdAt = now;
+            const elapsed = now - data.createdAt;
+
+            let currentReportTime = data.time;
+            let currentSupportTime = data.supportTime;
+
+            if(typeof data.reportBaseSec === 'number') {
+                currentReportTime = formatDetailedTime(data.reportBaseSec + elapsed);
+            }
+            if(typeof data.supportBaseSec === 'number') {
+                currentSupportTime = formatDetailedTime(data.supportBaseSec + elapsed);
+            }
+
+            document.getElementById('disp-time').innerText = currentReportTime;
+            document.getElementById('disp-time-bottom').innerText = currentSupportTime;
+        };
+
+        updateDynamicTimes();
+        liveTimerInterval = setInterval(updateDynamicTimes, 1000);
+
+        const latestPfp = localStorage.getItem('global_pfp') || data.pfp || '';
+        const latestLogo = localStorage.getItem('global_logo') || data.logo || '';
+
+        const dispPfpEl = document.getElementById('disp-pfp');
+        if (latestPfp) {
+            dispPfpEl.src = latestPfp;
+            dispPfpEl.style.display = 'block';
+        } else {
+            dispPfpEl.src = '';
+        }
+
+        document.getElementById('disp-user').innerText = data.user + "'s account";
+        document.getElementById('disp-reason').innerText = data.reason;
+
+        const logoContainer = document.getElementById('logoContainer');
+        const defaultIgIcon = document.getElementById('defaultIgIcon');
+        const customLogoImg = document.getElementById('customLogoImg');
+
+        if(latestLogo) {
+            logoContainer.style.background = 'transparent';
+            defaultIgIcon.style.display = 'none';
+            customLogoImg.src = latestLogo;
+            customLogoImg.style.display = 'block';
+        } else {
+            logoContainer.style.background = '#ffffff';
+            defaultIgIcon.style.display = 'block';
+            customLogoImg.style.display = 'none';
+        }
+
+        document.getElementById('disp-title-text').innerText = `We've removed ${data.user}'s account because it goes against our Community Standards.`;
+        document.getElementById('disp-msg-p1').innerText = `Thank you for reporting this account. We've removed it from Instagram because it goes against our Community Standards.`;
+        document.getElementById('disp-msg-p2').innerText = `Reports like yours are an important part of making Instagram a safe and welcoming place for everyone.`;
+
+        document.getElementById('pop-block').innerText = `Block ${data.user}`;
+        document.getElementById('pop-restrict').innerText = `Restrict ${data.user}`;
+
+        showPage('page3');
+    }
+}
+
+function openPopup() {
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+
+function closePopup(e) {
+    if(e.target.id === 'popupOverlay') {
+        document.getElementById('popupOverlay').style.display = 'none';
+    }
+}
+
+function closePopupForce() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}
+
+function showToast(text) {
+    const toast = document.getElementById('toastMessage');
+    toast.innerText = text;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2200);
+}
+
+function handlePopupBlock() {
+    closePopupForce();
+    showToast(`${currentActiveUsername || 'username'} was blocked`);
+}
+
+function handlePopupRestrict() {
+    closePopupForce();
+    showToast(`${currentActiveUsername || 'username'} was restricted`);
+}
+
+function openCommunityGuidelines() {
+    closePopupForce();
+    window.open('https://transparency.fb.com/policies/community-standards/', '_blank');
+}
+</script>
+</body>
+</html>
